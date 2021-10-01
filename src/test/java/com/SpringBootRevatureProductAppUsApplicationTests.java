@@ -1,8 +1,11 @@
 package com;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class SpringBootRevatureProductAppUsApplicationTests {
@@ -23,16 +24,21 @@ class SpringBootRevatureProductAppUsApplicationTests {
 	@Autowired
 	private RestTemplate restTemplate;
 
-	private String restAPIURL = "http://localhost";
+	private String baseURL = "http://localhost";
 
+	URL url,messageURL;
+	
+	@BeforeEach
+	public void setUp() throws MalformedURLException {
+		System.out.println("Before each ");
+		url = new URL(baseURL + ":" + port);
+		messageURL = new URL(baseURL + ":" + port+"/message");
+	}
 	@Test
 	@DisplayName("Testing home")
 	public void contextLoads() throws MalformedURLException {
 
-		URL url = new URL(restAPIURL + ":" + port);
-
 		ResponseEntity<String> response = restTemplate.getForEntity(url.toString(), String.class);
-
 		assertEquals("Welcome To Revature", response.getBody());
 
 	}
@@ -41,10 +47,7 @@ class SpringBootRevatureProductAppUsApplicationTests {
 	@DisplayName("Testing message")
 	public void testMessageAPI() throws MalformedURLException {
 		String expected = "-- Revature Training App --";
-
-		URL url = new URL(restAPIURL + ":" + port + "/message");
-
-		ResponseEntity<String> response = restTemplate.getForEntity(url.toString(), String.class);
+		ResponseEntity<String> response = restTemplate.getForEntity(messageURL.toString(), String.class);
 
 		assertEquals(expected, response.getBody());
 	}
